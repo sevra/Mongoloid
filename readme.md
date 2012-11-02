@@ -1,11 +1,13 @@
 ## Mongoloid
 I wrote __Mongoloid__ because every other module that claimed to implement __REST__ for __Mongoose__ was inadaquate in one way or another. With other modules I either couldn't specify a path at which my resources should be made available or I was asked to render my data with a view. I simply wanted a __RESTful__ interface to __MongoDB__ through __Mongoose__ for use with __Backbone.js__.
 
+*Props go out to Matt Bell (@mappum) who wrote __Mongorest__ which provided the inspriation for __Mongoloiod__.*
+
 ### Requirements
 
-	* Async
-	* MongoDB
-	* Mongoose
+* Async
+* MongoDB
+* Mongoose
 
 ### Basics
 There are three components to __Mongoloid__:
@@ -17,13 +19,13 @@ Managers pass `res`, `req` and `info` (in that order) to the proper `handler` fo
 
 `info` objects contain parsed information pertaining to a request:
 
-	* collection : the name of the collection.
-	* id : an ObjectId (if available) or null.
-	* query :
-		- limit : the number of objects to be returned. if negative, there is no limit.
-		- skip : the number of objects from the begining to skip.
-		- options : extra options parsed from GET variables to be passed to the Mongoose query.
-		- method : the HTTP method.
+* collection : the name of the collection.
+* id : an ObjectId (if available) or null.
+* query :
+	- limit : the number of objects to be returned. if negative, there is no limit.
+	- skip : the number of objects from the begining to skip.
+	- options : extra options parsed from GET variables to be passed to the Mongoose query.
+	- method : the HTTP method.
 
 Please note that the `query` options (i.e. `limit`, `skip`, `etc...`) are not implemented at this time.
 
@@ -32,16 +34,16 @@ Handlers contain a chain of callbacks which are passed to `async.waterfall`. Cal
 
 `data` objects contain:
 
-	* req : a request object.
-	* res : a response object.
-	* info : an info object as discussed earlier.
-	* self : the handler's context.
+* req : a request object.
+* res : a response object.
+* info : an info object as discussed earlier.
+* self : the handler's context.
 
 If an `error` is passed as the first argument to the callback then the chain of execution is terminated and no subsequent callbacks are fired. The order of execution is `handler.pre`, `handler.<method>`, `handler.post` where `<method>` is one of `get`, `post`, `put` or `delete`.
 
 A JSON response is returned once `handler.method` is called. If there is an `ObjectId` in `info` then a single object is returned. If there is no `ObjectId` then an array (which may be empty) is returned.
 
-Handlers contain a reference to the __Mongoose__ `model` for which they were created. The `model` is accessible in a callback through the `data.self.model` attriubete.
+Handlers contain a reference to the __Mongoose__ `model` for which they were created. The `model` is accessible in a middleware through the `data.self.model` attribute.
 
 #### Middleware
 Middleware (or callbacks) may be added one of two ways:
@@ -55,12 +57,12 @@ You can access the `pre` and `post` arrays for a handler directly through it's `
 ### Usage
 You must have __Async__, __MongoDB__ and __Mongoose__ installed.
 
-You can then initialize Mongoloid as follows:
+You can then initialize __Mongoloid__.`manager` as follows:
 ```js
 var mongoloid = require('mongoloid');
 var manager = new mongoloid.Manager({ path: '/api/rest' });
 ```
-Note that leading and trailing slashes in `path` are ignored.
+*Note that leading and trailing slashes in `path` are ignored.*
 
 `Manager` instances have a `router` function:
 ```js
@@ -154,6 +156,6 @@ You may have multiple managers listening on different paths:
 	...
 ```
 
-### Missing Features (at this time)
+### To-Do
 
-	* Creation, Deletion and Updating of collections.
+* Creation, Deletion and Updating of collections.
