@@ -1,3 +1,4 @@
+var util = require('util');
 var url = require('url');
 var querystring = require('querystring');
 var async = require('async');
@@ -22,8 +23,8 @@ function split_path(path) {
 function Handler(model) {
    this.model = model;
    this.calls = {
-      pre: [],
-      post: [],
+      pre: [ ],
+      post: [ ],
    };
 }
 
@@ -42,7 +43,7 @@ Handler.prototype = {
       var calls = Array(start).concat(this.calls.pre, method, this.calls.post);
       async.waterfall(calls, function(err, data) {
          if(err) {
-            console.log('mongoloid.Handler.process: ' + err);
+            util.log('mongoloid.Handler.process: ' + err);
             data.res.header('Content-Type', 'application/json');
             data.res.json({ error: err.message });
          }
@@ -50,7 +51,6 @@ Handler.prototype = {
    },
 
    _use: function(state, callback) {
-      console.log(state, callback);
       switch(state) {
          case 'pre':
             this.calls.pre.push(callback);
@@ -100,7 +100,6 @@ Handler.prototype = {
       put: function(data, callback) {
          var info = data.req.body;
          delete info._id;
-         console.log(info);
          data.self.model.update({ _id: data.info.id }, info, 
             function(err, affected) {
             if(!err) {
@@ -130,7 +129,7 @@ Handler.prototype = {
 function Manager(options) {
    this.options = options;
    this.options.path = split_path(options.path) || '';
-   this.handlers = {};
+   this.handlers = { };
 }
 
 Manager.prototype = {
@@ -141,7 +140,7 @@ Manager.prototype = {
             try {
                this.handlers[info.collection].process(req, res, info);
             } catch(err) {
-               console.log('mongoloid.Manager: ' + err);
+               util.log('mongoloid.Manager: ' + err);
             }
          }
          else {
@@ -173,7 +172,7 @@ Manager.prototype = {
       var query = {
          limit: GET.limit < 0 ? null : 100,
          skip: GET.skip || 0,
-         options: GET.query || null,
+         options: GET.query || { },
       };
       
       return { collection: path[0], 

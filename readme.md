@@ -1,5 +1,5 @@
 ## Mongoloid
-I was forced to write this module because every other module that claimed to implement REST for Mongoose was inadaquate in one way or another. With other modules I either couldn't specify a path at which my resources should be made available or I was asked to render my data with a view. I simply wanted a RESTful interface to MongoDB through Mongoose for use with Backbone.js, which is exactly what I have created.
+I wrote __Mongoloid__ because every other module that claimed to implement __REST__ for __Mongoose__ was inadaquate in one way or another. With other modules I either couldn't specify a path at which my resources should be made available or I was asked to render my data with a view. I simply wanted a __RESTful__ interface to __MongoDB__ through __Mongoose__ for use with __Backbone.js__.
 
 ### Requirements
 
@@ -8,12 +8,12 @@ I was forced to write this module because every other module that claimed to imp
 	* Mongoose
 
 ### Basics
-There are two components to Mongoloid:
+There are three components to __Mongoloid__:
 
 #### Managers
-Managers create a new `handler` for each Mongoose model added.
+Managers create a new `handler` for each __Mongoose__ model added.
 
-Managers pass `res`, `req` and `info` (in that order) to the proper `handler` for processing. Managers won't respond to requests that are not addressed to their __path__.
+Managers pass `res`, `req` and `info` (in that order) to the proper `handler` for processing. Managers won't respond to requests that are not addressed to their `path`.
 
 `info` objects contain parsed information pertaining to a request:
 
@@ -37,29 +37,32 @@ Handlers contain a chain of callbacks which are passed to `async.waterfall`. Cal
 	* info : an info object as discussed earlier.
 	* self : the handler's context.
 
-If an `error` is passed as the first argument to the callback then the chain of execution is terminated and no subsequent callbacks are fired. The order of execution is `handler.pre`, `handler.<method>`, `handler.post` where `<method>` is one of `get`, `post`, `put`, `delete`.
+If an `error` is passed as the first argument to the callback then the chain of execution is terminated and no subsequent callbacks are fired. The order of execution is `handler.pre`, `handler.<method>`, `handler.post` where `<method>` is one of `get`, `post`, `put` or `delete`.
 
 A JSON response is returned once `handler.method` is called. If there is an `ObjectId` in `info` then a single object is returned. If there is no `ObjectId` then an array (which may be empty) is returned.
+
+Handlers contain a reference to the __Mongoose__ `model` for which they were created. The `model` is accessible in a callback through the `data.self.model` attriubet.
 
 #### Middleware
 Middleware (or callbacks) may be added one of two ways:
 
-The first way is through the `manager`'s helper functions `pre` and `post`. Middleware added in this manner is added to each `handler` the manager owns at that point in time.
+You can add middleware with the use of a `manager`'s helper function: `pre` or `post`. Middleware added in this manner is added to each `handler` the manager owns at that point in time.
 
 Middleware can also be added directly to a `handler` through it's `pre` and `post` functions. 
 
 You can access the `pre` and `post` arrays for a handler directly through it's `calls` object: i.e. `<manager>.handlers.<handler>.calls.<pre or post>`.
 
 ### Usage
-Make sure you have __async__, __mongodb__ and __mongoose__ installed.
+You must have __Async__, __MongoDB__ and __Mongoose__ installed.
 
 You can then initialize Mongoloid as follows:
 ```js
 var mongoloid = require('mongoloid');
 var manager = new mongoloid.Manager({ path: '/api/rest' });
 ```
+Note that leading and trailing slashes in `path` are ignored.
 
-`Manager` instances have a `route` function:
+`Manager` instances have a `router` function:
 ```js
 ...
 app.configure(function() {
@@ -70,10 +73,10 @@ app.configure(function() {
 ...
 ```
 
-Now we need to add some models to our `manager`:
+Now we need to create some __Mongoose__ models:
 ```js
 	var mongoose = require('mongoose');
-	var db = mongoose.createConnection('localhost', 'mydb');
+	var db = mongoose.createConnection('localhost', 'db');
 
 	var Document = db.model('document', new mongoose.Schema({
 		title: String,
@@ -87,7 +90,7 @@ Now we need to add some models to our `manager`:
 	}));
 ```
 
-We can then add our models to our `manager`:
+We can then add our models to a `manager`:
 ```js
 	manager.add('documents', Document);
 	manager.add('people', Person);
@@ -134,12 +137,12 @@ Finally, lets add some middleware:
 	});
 ```
 
-You may also have multiple managers listening on different paths:
+You may have multiple managers listening on different paths:
 ```js
 	...
 
 	var rest = mongoloid.Manager({ path: '/rest/' });
-	var crud = mongoloid.Manager({ ptah: 'crud' });
+	var crud = mongoloid.Manager({ ptah: '/api/crud/' });
 
 	...
 	app.configure(function() {
@@ -153,4 +156,4 @@ You may also have multiple managers listening on different paths:
 
 ### Missing Features (at this time)
 
-	* Creating, Updating and Deleting of collections.
+	* Creation, Deletion and Updating of collections.
