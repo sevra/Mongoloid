@@ -41,7 +41,7 @@ If an `error` is passed as the first argument to the callback then the chain of 
 
 A JSON response is returned once `handler.method` is called. If there is an `ObjectId` in `info` then a single object is returned. If there is no `ObjectId` then an array (which may be empty) is returned.
 
-Handlers contain a reference to the __Mongoose__ `model` for which they were created. The `model` is accessible in a callback through the `data.self.model` attriubet.
+Handlers contain a reference to the __Mongoose__ `model` for which they were created. The `model` is accessible in a callback through the `data.self.model` attriubete.
 
 #### Middleware
 Middleware (or callbacks) may be added one of two ways:

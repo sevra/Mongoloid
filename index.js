@@ -66,9 +66,6 @@ Handler.prototype = {
    pre: function(callback) { this._use('pre', callback); },
    post: function(callback) { this._use('post', callback); },
 
-   // XXX If these methods reside directly in the Handler prototype they 
-   // aren't accessible with 'this[<method>]' but nested in the 'methods'
-   // object they're accessible through this.methods[<method>]. Why?
    methods: {
       get: function(data, callback) {
          var lookup = { };
