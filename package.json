@@ -1,0 +1,17 @@
+{
+	"author": "Paul Severance <paulseverance+node@gmail.com>",
+	"name": "mongoloid",
+	"description": "A Connect/Express middleware that integrates with Mongoose to provide a RESTful API.",
+	"version": "0.0.1",
+	"main": "index.js",
+	"dependancies": {
+		"async": "*",
+		"mongodb": "*",
+		"mongoose": "*"
+	},
+	"devDependencies": {},
+	"optionalDependencies": {},
+	"engines": {
+		"node": "*"
+	}
+}
