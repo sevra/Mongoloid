@@ -114,7 +114,7 @@ Finally, lets add some middleware:
 	// fires before JSON results have been returned to client
 	// but after the previous callback has finished execution
 	// applies only to 'documents'
-	manager.documents.pre(function(data, callback) {
+	manager.handlers.documents.pre(function(data, callback) {
 		console.log(data.info.res); // prints our response object
 		try {
 			// spam, spam, spam, eggs and spam
@@ -126,7 +126,7 @@ Finally, lets add some middleware:
 
 	// fires after JSON result has been returned to client
 	// only applies to 'people'
-	manager.people.post(function(data, callback) {
+	manager.handlers.people.post(function(data, callback) {
 		console.log(data.info.collection); // prints 'people'
 		try {
 			// spam, spam, spam, eggs, bacon and spam
