@@ -2,8 +2,6 @@ var util = require('util');
 var url = require('url');
 var querystring = require('querystring');
 var async = require('async');
-var mongodb = require('mongodb');
-var mongoose = require('mongoose');
 
 
 function split_path(path) {

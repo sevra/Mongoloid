@@ -19,13 +19,13 @@ Managers pass `res`, `req` and `info` (in that order) to the proper `handler` fo
 
 `info` objects contain parsed information pertaining to a request:
 
-* collection : the name of the collection.
-* id : an ObjectId (if available) or null.
-* query :
-	- limit : the number of objects to be returned. if negative, there is no limit.
-	- skip : the number of objects from the begining to skip.
-	- options : extra options parsed from GET variables to be passed to the Mongoose query.
-	- method : the HTTP method.
+* `collection` : the name of the collection.
+* `id` : an ObjectId (if available) or null.
+* `query` :
+	- `limit` : the number of objects to be returned. if negative, there is no limit.
+	- `skip` : the number of objects from the begining to skip.
+	- `options` : extra options parsed from GET variables to be passed to the Mongoose query.
+	- `method` : the HTTP method.
 
 Please note that the `query` options (i.e. `limit`, `skip`, `etc...`) are not implemented at this time.
 
@@ -34,10 +34,10 @@ Handlers contain a chain of callbacks which are passed to `async.waterfall`. Cal
 
 `data` objects contain:
 
-* req : a request object.
-* res : a response object.
-* info : an info object as discussed earlier.
-* self : the handler's context.
+* `req` : a request object.
+* `res` : a response object.
+* `info` : an info object as discussed earlier.
+* `self` : the handler's context.
 
 If an `error` is passed as the first argument to the callback then the chain of execution is terminated and no subsequent callbacks are fired. The order of execution is `handler.pre`, `handler.<method>`, `handler.post` where `<method>` is one of `get`, `post`, `put` or `delete`.
 
