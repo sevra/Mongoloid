@@ -23,7 +23,9 @@ Managers pass `res`, `req` and `info` (in that order) to the proper `handler` fo
 * `id` : an ObjectId (if available) or null.
 * `query` :
 	- `limit` : the number of objects to be returned. if negative, there is no limit.
+		- Defaults to 100.
 	- `skip` : the number of objects from the begining to skip.
+		- Defaults to 0.
 	- `options` : extra options parsed from GET variables to be passed to the Mongoose query.
 	- `method` : the HTTP method.
 

@@ -18,6 +18,7 @@ function split_path(path) {
    return path.substr(popfirst ? 1 : 0, poplast ? last - 1 : last).split('/');
 }
 
+
 function Handler(model) {
    this.model = model;
    this.calls = {
@@ -69,52 +70,66 @@ Handler.prototype = {
          var lookup = { };
          if(data.info.id)
             lookup._id = data.info.id;
+         else if(data.info.query.lookup)
+            lookup = data.info.query.lookup;
 
-         data.self.model.find(lookup, null, null, function(err, objs) {
-            if(!err) {
-               data.res.header('Content-Type', 'application/json');
-               data.res.json(data.info.id ? objs.pop() : objs, 200);
-               callback(null, data);
-            } else {
-               callback(err, data);
+         data.self.model.find(lookup, data.info.query.keys, data.info.query, function(err, objs) {
+            if(err) {
+               callback(err, data); 
+               return;
             }
+
+            data.res.header('Content-Type', 'application/json');
+            data.res.json(data.info.id ? objs.pop() : objs, 200);
+            callback(null, data);
          });
       },
 
       post: function(data, callback) {
-         data.self.model(data.req.body).save(function(err, affected) {
-            if(!err) {
-               data.res.header('Content-Type', 'application/json');
-               data.res.json({ ok: affected }, 201);
-            } else {
+         data.self.model(data.req.body).save(function(err, count) {
+            if(err) {
                callback(err, data);
+               return;
             }
+
+            data.res.header('Content-Type', 'application/json');
+            data.res.json({ ok: count }, 201);
+            callback(null, data);
          });
       },
 
       put: function(data, callback) {
          var info = data.req.body;
          delete info._id;
-         data.self.model.update({ _id: data.info.id }, info, 
-            function(err, affected) {
-            if(!err) {
-               data.res.header('Content-Type', 'application/json');
-               data.res.json({ ok: affected }, 201);
-            } else {
+         data.self.model.update({ _id: data.info.id }, info, function(err, count) {
+            if(err) {
                callback(err, data);
+               return;
             }
+
+            data.res.header('Content-Type', 'application/json');
+            data.res.json({ ok: count }, 201);
+            callback(null, data);
          });
       },
 
       delete: function(data, callback) {
          data.self.model.findById(data.info.id, function(err, obj) {
-            if(!err) {
-               obj.remove();
+            if(err) {
+               callback(err, data);
+               return;
+            }
+
+            obj.remove(function(err, obj) {
+               if(err) {
+                  callback(err, data);
+                  return;
+               }
+
                data.res.header('Content-Type', 'application/json');
                data.res.json({ ok: 1 }, 201);
-            } else {
-               callback(err, data);
-            }
+               callback(null, data);
+            });
          });
       }
    }
@@ -137,8 +152,7 @@ Manager.prototype = {
             } catch(err) {
                util.log('mongoloid.Manager: ' + err);
             }
-         }
-         else {
+         } else {
             res.header('Content-Type', 'application/json');
             res.json({ error: 'Collection not found.' }, 500);
          }
@@ -165,11 +179,12 @@ Manager.prototype = {
 
       var GET = querystring.parse(parsed.query);
       var query = {
-         limit: GET.limit < 0 ? null : 100,
+         limit: GET.limit || 100,
          skip: GET.skip || 0,
-         options: GET.query || { },
+         keys: GET.keys || null,
+         lookup: JSON.parse(GET.lookup || '{ }'), 
       };
-      
+
       return { collection: path[0], 
                id: path[1], 
                query: query,
